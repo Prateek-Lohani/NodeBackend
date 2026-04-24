@@ -164,10 +164,11 @@ await user.save();
 const bcrypt = require('bcrypt');
 
 // In /login endpoint:
-  const { email, password } = req.body;
+const { email, password } = req.body;
 
-  const user=await User.findOne({email:email});  // finding userobj with the email
-  const isMatchedPassword = await bcrypt.compare(req.body.password, user.password);
+const user=await User.findOne({email:email});  // finding userobj with the email
+const isMatchedPassword = await bcrypt.compare(req.body.password, user.password);
+```
 
 ## Notes
 - Implement bcrypt for hashing
