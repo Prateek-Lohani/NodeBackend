@@ -119,9 +119,29 @@ PATCH /updateUserDetailsByEmail
 ## Running the API
 1. `npm install`
 2. Set `.env` with `PORT` and MongoDB `MONGODB_URI`
-3. `npm start` or `node src/app.js`
+3. `npm run local` 
+
+## Password Security (bcrypt)
+
+**bcrypt v6.0.0** is installed.
+
+### Issue
+Passwords stored as plain text ❌
+
+###  Implementation
+```javascript
+const bcrypt = require('bcrypt');
+const saltRounds = 12;
+
+// In /signup endpoint, BEFORE saving:
+const hashedPassword = await bcrypt.hash(req.body.password, saltRounds);
+req.body.password = hashedPassword;
+const user = new User(req.body);
+await user.save();
+```
 
 ## Notes
+- Implement bcrypt for hashing
 - Signup includes validation (via `signupValidator.js`)
 - All endpoints include error handling
 - Uses MongoDB with Mongoose ODM
