@@ -1,4 +1,4 @@
-# DevTinder Backend API Documentation
+# Node Backend API Documentation
 
 ## Base URL
 ```
