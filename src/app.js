@@ -4,6 +4,7 @@ const connectDB = require("./config/database");
 const app = express();
 const PORT = process.env.PORT;
 const User = require("./models/user");
+const { signupValidation } = require("./utils/signupValidator");
 
 app.use(express.json());
 
@@ -11,6 +12,17 @@ const pick = (obj, allowedFields) =>
   Object.fromEntries(
     Object.entries(obj).filter(([key]) => allowedFields.includes(key)),
   );
+
+app.post('/signup',async(req,res)=>{
+  try {
+    signupValidation(req)
+    const user = new User(req.body);
+    await user.save();
+    res.status(201).send("User Added Successfully");
+  } catch (e) {
+    res.status(500).send(`Error creating user: ` + e.message);
+  }
+})
 
 app.post("/addUser", async (req, res) => {
   const user = new User(req.body);
