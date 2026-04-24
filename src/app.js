@@ -36,6 +36,29 @@ app.post('/signup',async(req,res)=>{
   }
 })
 
+app.post('/login',async(req,res)=>{
+  try{
+    const { email, password } = req.body;
+
+    const user=await User.findOne({email:email});
+    if(!user){
+      throw new Error('User with the email does not exist')
+    }
+
+    const checkPasswordValid=await bcrypt.compare(password,user.password)
+
+    if(checkPasswordValid){
+      res.send('Login Successful')
+    }else{
+      res.send('Invaid Password')
+    }
+  }catch(error){
+    res.status(500).send(`Error Login user: ` + error.message);
+  }
+  
+
+})
+
 app.post("/addUser", async (req, res) => {
   const user = new User(req.body);
   try {

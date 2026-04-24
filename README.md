@@ -21,6 +21,25 @@ http://localhost:PORT
 
 ## API Endpoints
 
+### 0. User Login 
+```
+POST /login
+```
+**Description:** Logs In registered user
+
+**Request Body:**
+```json
+{
+  "email": "john.doe@example.com",
+  "password": "securepassword123",
+  
+}
+```
+
+**Response:**
+- **201**: `"Login Successful"`
+- **500**: Error message
+
 ### 1. User Signup 
 ```
 POST /signup
@@ -139,6 +158,16 @@ req.body.password = hashedPassword;
 const user = new User(req.body);
 await user.save();
 ```
+
+### Comparision of Password
+```javascript
+const bcrypt = require('bcrypt');
+
+// In /login endpoint:
+  const { email, password } = req.body;
+
+  const user=await User.findOne({email:email});  // finding userobj with the email
+  const isMatchedPassword = await bcrypt.compare(req.body.password, user.password);
 
 ## Notes
 - Implement bcrypt for hashing
