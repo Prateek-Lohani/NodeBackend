@@ -6,6 +6,8 @@ const PORT = process.env.PORT;
 const User = require("./models/user");
 const { signupValidation } = require("./utils/signupValidator");
 
+const bcrypt=require('bcrypt');
+
 app.use(express.json());
 
 const pick = (obj, allowedFields) =>
@@ -16,7 +18,17 @@ const pick = (obj, allowedFields) =>
 app.post('/signup',async(req,res)=>{
   try {
     signupValidation(req)
-    const user = new User(req.body);
+
+    const {firstName,lastName,email,password}=req.body;
+    const hashedPassword=await bcrypt.hash(password,10);
+
+
+    const user = new User({
+      firstName,
+      lastName,
+      email,
+      password:hashedPassword
+    });
     await user.save();
     res.status(201).send("User Added Successfully");
   } catch (e) {
