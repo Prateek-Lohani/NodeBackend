@@ -42,7 +42,7 @@ app.post('/login',async(req,res)=>{
 
     const user=await User.findOne({email:email});
     if(!user){
-      throw new Error('User with the email does not exist')
+      throw new Error('Invaid Credentials')
     }
 
     const checkPasswordValid=await bcrypt.compare(password,user.password)
@@ -50,7 +50,7 @@ app.post('/login',async(req,res)=>{
     if(checkPasswordValid){
       res.send('Login Successful')
     }else{
-      res.send('Invaid Password')
+      res.send('Invaid Credentials')
     }
   }catch(error){
     res.status(500).send(`Error Login user: ` + error.message);
