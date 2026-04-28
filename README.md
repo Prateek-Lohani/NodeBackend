@@ -74,7 +74,7 @@ POST /addUser
 
 ### 3. Get All Users
 ```
-GET /getAllUsers
+GET /getAllUsers  [Protected]
 ```
 **Description:** Fetch all users
 
@@ -137,7 +137,7 @@ PATCH /updateUserDetailsByEmail
 
 ### 7. Get Logged In User Details
 ```
-GET /getLoggedInProfile
+GET /getLoggedInProfile  [Protected]
 ```
 **Description:** Find LoggedIn user 
 

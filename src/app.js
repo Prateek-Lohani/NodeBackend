@@ -10,6 +10,7 @@ const cookieParser = require("cookie-parser");
 const jwt = require("jsonwebtoken");
 
 const bcrypt = require("bcrypt");
+const { userAuth } = require("./middleware/auth");
 
 app.use(express.json());
 app.use(cookieParser());
@@ -64,20 +65,11 @@ app.post("/login", async (req, res) => {
   }
 });
 
-app.get("/getLoggedInProfile", async (req, res) => {
-  const cookies = req.cookies;
+app.get("/getLoggedInProfile", userAuth,  async (req, res) => {
 
   try {
-    const { token } = cookies;
-
-    if (!token) {
-      res.status(401).send("Unauthorized");
-    } else {
-      const decodedMessage = await jwt.verify(token, BACKEND_SECRETKEY);
-
-      const { _id } = decodedMessage;
-
-      const user = await User.findById(_id);
+      const user=req.user;
+      
       res.send({
         _id: user.id,
         firstName: user.firstName,
@@ -85,7 +77,7 @@ app.get("/getLoggedInProfile", async (req, res) => {
         email: user.email,
         pfp: user.pfp
       });
-    }
+    
   } catch (error) {
     res.status(500).send(`Error Getting Logged In user: ` + e.message);
   }
@@ -101,7 +93,7 @@ app.post("/addUser", async (req, res) => {
   }
 });
 
-app.get("/getAllUsers", async (req, res) => {
+app.get("/getAllUsers", userAuth, async (req, res) => {
   try {
     const users = await User.find({});
     if (users.length === 0) {
