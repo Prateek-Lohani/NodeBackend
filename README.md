@@ -23,7 +23,7 @@ http://localhost:PORT
 
 ### 0. User Login 
 ```
-POST /login
+POST /login (JWT Authentication + Cookie Parser)
 ```
 **Description:** Logs In registered user
 
@@ -135,9 +135,20 @@ PATCH /updateUserDetailsByEmail
 - **200**: `"User Updated Successfully"` or `"No user found..."`
 - **400**: `"Email is required"`
 
+### 7. Get Logged In User Details
+```
+GET /getLoggedInProfile
+```
+**Description:** Find LoggedIn user 
+
+
+**Response:**
+- **200**: User object or `"Error Getting Logged In user..."`
+
+
 ## Running the API
 1. `npm install`
-2. Set `.env` with `PORT` and MongoDB `MONGODB_URI`
+2. Set `.env` with `PORT`,`BACKEND_SECRETKEY` and MongoDB `MONGODB_URI`
 3. `npm run local` 
 
 ## Password Security (bcrypt)

@@ -1,63 +1,89 @@
 const express = require("express");
-require('dotenv').config();
+require("dotenv").config();
 const connectDB = require("./config/database");
 const app = express();
 const PORT = process.env.PORT;
+const BACKEND_SECRETKEY = process.env.BACKEND_SECRETKEY;
 const User = require("./models/user");
 const { signupValidation } = require("./utils/signupValidator");
+const cookieParser = require("cookie-parser");
+const jwt = require("jsonwebtoken");
 
-const bcrypt=require('bcrypt');
+const bcrypt = require("bcrypt");
 
 app.use(express.json());
+app.use(cookieParser());
 
 const pick = (obj, allowedFields) =>
   Object.fromEntries(
     Object.entries(obj).filter(([key]) => allowedFields.includes(key)),
   );
 
-app.post('/signup',async(req,res)=>{
+app.post("/signup", async (req, res) => {
   try {
-    signupValidation(req)
+    signupValidation(req);
 
-    const {firstName,lastName,email,password}=req.body;
-    const hashedPassword=await bcrypt.hash(password,10);
-
+    const { firstName, lastName, email, password } = req.body;
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     const user = new User({
       firstName,
       lastName,
       email,
-      password:hashedPassword
+      password: hashedPassword,
     });
     await user.save();
     res.status(201).send("User Added Successfully");
   } catch (e) {
     res.status(500).send(`Error creating user: ` + e.message);
   }
-})
+});
 
-app.post('/login',async(req,res)=>{
-  try{
+app.post("/login", async (req, res) => {
+  try {
     const { email, password } = req.body;
 
-    const user=await User.findOne({email:email});
-    if(!user){
-      throw new Error('Invaid Credentials')
+    const user = await User.findOne({ email: email });
+    if (!user) {
+      throw new Error("Invaid Credentials");
     }
 
-    const checkPasswordValid=await bcrypt.compare(password,user.password)
+    const checkPasswordValid = await bcrypt.compare(password, user.password);
 
-    if(checkPasswordValid){
-      res.send('Login Successful')
-    }else{
-      res.send('Invaid Credentials')
+    if (checkPasswordValid) {
+      const token = await jwt.sign({ _id: user._id }, BACKEND_SECRETKEY, {
+        expiresIn: "6h",
+      });
+      res.cookie("token", token);
+      res.send("Login Successfully");
+    } else {
+      res.send("Invaid Credentials");
     }
-  }catch(error){
+  } catch (error) {
     res.status(500).send(`Error Login user: ` + error.message);
   }
-  
+});
 
-})
+app.get("/getLoggedInProfile", async (req, res) => {
+  const cookies = req.cookies;
+
+  try {
+    const { token } = cookies;
+
+    if (!token) {
+      res.status(401).send("Unauthorized");
+    } else {
+      const decodedMessage = await jwt.verify(token, BACKEND_SECRETKEY);
+
+      const { _id } = decodedMessage;
+
+      const user = await User.findById(_id);
+      res.send(user);
+    }
+  } catch (error) {
+    res.status(500).send(`Error Getting Logged In user: ` + e.message);
+  }
+});
 
 app.post("/addUser", async (req, res) => {
   const user = new User(req.body);
