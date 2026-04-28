@@ -78,7 +78,13 @@ app.get("/getLoggedInProfile", async (req, res) => {
       const { _id } = decodedMessage;
 
       const user = await User.findById(_id);
-      res.send(user);
+      res.send({
+        _id: user.id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        pfp: user.pfp
+      });
     }
   } catch (error) {
     res.status(500).send(`Error Getting Logged In user: ` + e.message);
@@ -101,7 +107,15 @@ app.get("/getAllUsers", async (req, res) => {
     if (users.length === 0) {
       res.send("No Users");
     } else {
-      res.send(users);
+      res.send(users.map((userDetails)=>{
+        return {
+        _id: userDetails.id,
+        firstName: userDetails.firstName,
+        lastName: userDetails.lastName,
+        email: userDetails.email,
+        pfp: userDetails.pfp      
+        }
+      }));
     }
   } catch (e) {
     res.status(500).send(`Error fetching user: ` + e.message);
@@ -111,11 +125,17 @@ app.get("/getAllUsers", async (req, res) => {
 app.post("/getUserDetailsByEmail", async (req, res) => {
   const userEmail = req.body.email;
   try {
-    const userData = await User.find({ email: userEmail });
+    const userData = await User.findOne({ email: userEmail });
     if (!userData) {
       res.status(200).send(`No user found for the email ${userEmail}`);
     } else {
-      res.status(200).send(userData);
+      res.status(200).send({
+        _id: userData.id,
+        firstName: userData.firstName,
+        lastName: userData.lastName,
+        email: userData.email,
+        pfp: userData.pfp
+      });
     }
   } catch (e) {
     res.status(500).send(`Error getting user: ` + e.message);
