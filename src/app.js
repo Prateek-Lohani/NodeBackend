@@ -7,7 +7,6 @@ const BACKEND_SECRETKEY = process.env.BACKEND_SECRETKEY;
 const User = require("./models/user");
 const { signupValidation } = require("./utils/signupValidator");
 const cookieParser = require("cookie-parser");
-const jwt = require("jsonwebtoken");
 
 const bcrypt = require("bcrypt");
 const { userAuth } = require("./middleware/auth");
@@ -52,9 +51,9 @@ app.post("/login", async (req, res) => {
     const checkPasswordValid = await bcrypt.compare(password, user.password);
 
     if (checkPasswordValid) {
-      const token = await jwt.sign({ _id: user._id }, BACKEND_SECRETKEY, {
-        expiresIn: "6h",
-      });
+      
+      const token = await user.getJWT();
+
       res.cookie("token", token);
       res.send("Login Successfully");
     } else {
