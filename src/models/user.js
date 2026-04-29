@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
+const bcrypt = require("bcrypt");
 
 const BACKEND_SECRETKEY = process.env.BACKEND_SECRETKEY;
 
@@ -45,6 +46,13 @@ userSchema.methods.getJWT = async function () {
   });
 
   return token;
+};
+
+userSchema.methods.validateUser = async function (password) {
+  const user = this;
+  const validUser = await bcrypt.compare(password, user.password);
+
+  return validUser;
 };
 
 const userModel = mongoose.model("user", userSchema);
